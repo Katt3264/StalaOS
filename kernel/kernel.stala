@@ -1,0 +1,100 @@
+include "stdlib/stdlib.stala"
+include "stdlib/x86_32_asm.stala"
+include "kernel/screenIO.stala"
+
+func main do
+
+	"Hello from Stala kernel" let str
+	#str strlen let len
+ 	2 let len
+
+	str
+	SCREEN_BUFFER
+	len
+	#memcpy
+
+	0x7c00 SCREEN_BUFFER 100 memcpy
+
+	0 set_col_cursor
+	#clear_screen
+	update_screen
+
+	while 1 do
+		kernel_loop
+	end
+end
+
+func kernel_loop do
+	
+	keyboard_pool let key_button
+		
+	key_button 10 = if
+		scroll_screen
+	else key_button 0 != elif
+		key_button feed_character
+	end
+	
+end
+
+
+
+func keyboard_pool do
+	
+	asm " k_AGAIN: "
+
+	asm " mov eax, 0 "
+	asm " in al,64h       ; get the status "
+	asm " test al,1       ; check output buffer "
+	asm " jz short k_AGAIN "
+
+	asm " test al,20h     ; check if it is a PS2Mouse-byte "
+	asm " jnz short k_AGAIN "
+	asm " in al,60h       ; get the key "
+
+	asm " cmp eax, 90 "
+	asm " jge k_AGAIN "
+
+	asm " mov ebx, SCAN_CODE_TO_ASCII "
+	asm " add ebx, eax "
+	asm " mov al, [ebx] "
+
+	# 0 - check
+	#asm " cmp eax, 0 "
+	#asm " je k_AGAIN "
+
+	#asm " mov [ebp], eax "
+	#asm " add ebp, 4 "
+	asm " call push_eax"
+
+
+	let code
+	
+	code ret
+
+	asm " ret "
+ 	# enter-10  backspace-8  left-7 up-3 down-6 right-4
+	asm " SCAN_CODE_TO_ASCII db 0, '?', '1', '2', '3', '4', '5', '6', '7', '8' ; 0-9 "
+	asm " NEXT0 db '9', '0', 0, 0, 8, 0, 'Q', 'W', 'E', 'R' ; 10-19 "
+	asm " NEXT1 db 'T', 'Y', 'U', 'I', 'O', 'P', 0, 0, 10, 0 ; 20-29 "
+	asm " NEXT2 db 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 0 ; 30-39 "
+	asm " NEXT3 db 0, 0, 0, 0, 'Z', 'X', 'C', 'V', 'B', 'N' ; 40-49 "
+	asm " NEXT4 db 'M', ',', '.', 0, 0, 0, 0, ' ', 0, 0 ; 50-59 "
+	asm " NEXT5 db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; 60-69 "
+	asm " NEXT6 db 0, 0, 3, 0, 0, 7, 0, 4, 0, 0 ; 70-79 "
+	asm " NEXT7 db 6, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; 80-89 "
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
