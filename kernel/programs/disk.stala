@@ -1,0 +1,35 @@
+func run_program_disk str do
+
+	str 10 str_to_int let sector_index
+
+	sector_index ++ let sector_index
+	
+	SECTOR_BUFFERT sector_index 10 int_to_str
+	#SECTOR_BUFFERT feed_string
+
+	SECTOR_BUFFERT sector_index 1
+
+	asm "call pop_ecx"
+	asm "call pop_eax"
+	asm "call pop_edi"
+	#asm "call ata_lba_read"
+
+	SECTOR_BUFFERT let ptr
+
+	0 let j
+	while j 512 64 / != do
+		0 let i
+		while i 64 != do
+			ptr ?8 let ch
+			ch feed_character
+			ptr ++ let ptr
+			i ++ let i
+		end
+		scroll_screen
+		j ++ let j
+	end
+
+	
+end
+
+func SECTOR_BUFFERT do 0x300000 end

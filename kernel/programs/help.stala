@@ -1,0 +1,6 @@
+func run_program_help str do
+	"List of commands:" feed_string scroll_screen
+	"help - display this message" feed_string scroll_screen
+	"clear - clear the screen" feed_string scroll_screen
+	"echo str - prints a string" feed_string scroll_screen
+end

@@ -12,7 +12,7 @@ mkdir "$TEMP_DIR"
 ./stala_x86_32 kernel/kernel.stala -out "$TEMP_DIR"/StalaKernel.asm
 
 
-nasm -f bin boot_sector/boot_sector.asm -o "$TEMP_DIR"/boot_sector.bin
+nasm -f bin boot/boot_sector.asm -o "$TEMP_DIR"/boot_sector.bin
 
 dd if=/dev/zero of="$TEMP_DIR"/floppy.img bs=1024 count=1440
 dd if="$TEMP_DIR"/boot_sector.bin of="$TEMP_DIR"/floppy.img seek=0 count=20 conv=notrunc

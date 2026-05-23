@@ -1,0 +1,4 @@
+func run_program_echo str do
+	str "echo " strlen + let out_str
+	out_str feed_string
+end

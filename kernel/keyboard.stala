@@ -1,0 +1,52 @@
+func BTN_ENTER do 10 end
+func BTN_BACKSPACE do 8 end
+func BTN_ARROW_UP do 3 end
+func BTN_ARROW_DOWN do 6 end
+func BTN_ARROW_RIGHT do 4 end
+func BTN_ARROW_LEFT do 7 end
+
+func keyboard_pool do
+	
+	asm " k_AGAIN: "
+
+	asm " mov eax, 0 "
+	asm " in al,64h       ; get the status "
+	asm " test al,1       ; check output buffer "
+	asm " jz short k_AGAIN "
+
+	asm " test al,20h     ; check if it is a PS2Mouse-byte "
+	asm " jnz short k_AGAIN "
+	asm " in al,60h       ; get the key "
+
+	asm " cmp eax, 90 "
+	asm " jge k_AGAIN "
+
+	asm " mov ebx, SCAN_CODE_TO_ASCII "
+	asm " add ebx, eax "
+	asm " mov al, [ebx] "
+
+	# 0 - check
+	#asm " cmp eax, 0 "
+	#asm " je k_AGAIN "
+
+	#asm " mov [ebp], eax "
+	#asm " add ebp, 4 "
+	asm " call push_eax"
+
+
+	let code
+	
+	code ret
+
+	asm " ret "
+ 	# enter-10  backspace-8  left-7 up-3 down-6 right-4
+	asm " SCAN_CODE_TO_ASCII db 0, '?', '1', '2', '3', '4', '5', '6', '7', '8' ; 0-9 "
+	asm " NEXT0 db '9', '0', 0, 0, 8, 0, 'Q', 'W', 'E', 'R' ; 10-19 "
+	asm " NEXT1 db 'T', 'Y', 'U', 'I', 'O', 'P', 0, 0, 10, 0 ; 20-29 "
+	asm " NEXT2 db 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 0 ; 30-39 "
+	asm " NEXT3 db 0, 0, 0, 0, 'Z', 'X', 'C', 'V', 'B', 'N' ; 40-49 "
+	asm " NEXT4 db 'M', ',', '.', 0, 0, 0, 0, ' ', 0, 0 ; 50-59 "
+	asm " NEXT5 db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; 60-69 "
+	asm " NEXT6 db 0, 0, 3, 0, 0, 7, 0, 4, 0, 0 ; 70-79 "
+	asm " NEXT7 db 6, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; 80-89 "
+end

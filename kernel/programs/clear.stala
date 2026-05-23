@@ -1,0 +1,3 @@
+func run_program_clear str do
+	clear_screen
+end

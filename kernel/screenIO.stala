@@ -1,6 +1,83 @@
 
-func clear_screen do
 
+# Writes all characters from buffert to screen
+func update_screen do
+	SCREEN_MEMORY let sm
+	SCREEN_BUFFER let sb
+	0 let i
+	while i SCREEN_ROWS SCREEN_COLUMNS * != do
+		sb ?8 let val
+		sm val !8 # character
+		sm ++ 0x0f !8 # color
+
+		sb ++ let sb
+		sm 2 + let sm
+		i ++ let i
+	end
+end
+
+# Writes a single character from buffert to screen
+func update_screen_character row col do
+	col
+	row SCREEN_COLUMNS * +
+	let i
+	
+	SCREEN_BUFFER i + ?8 let val
+	SCREEN_MEMORY i 2 * + val !8 # character
+	SCREEN_MEMORY i 2 * ++ + 0x0f !8 # color
+	i ++ let i
+end
+
+func col_cursor_addr do "1234567" end
+func set_col_cursor val do col_cursor_addr val !8 end
+func get_col_cursor do col_cursor_addr ?8 end
+
+func SCREEN_BUFFER  do 0x100000 end
+func SCREEN_MEMORY  do 0xb8000 end # true address
+func SCREEN_ROWS    do 25 end
+func SCREEN_COLUMNS do 80 end
+
+
+
+#
+# PUBLIC INTERFACE FOR SCREEN
+#
+
+func feed_string str do
+	while str ?8 0 != do
+		str ?8 feed_character
+		str ++ let str
+	end
+end
+
+# Puts a single character on the current line
+func feed_character char do
+	get_col_cursor let cursor
+	cursor SCREEN_COLUMNS < if
+		SCREEN_BUFFER cursor + char !8
+		0 cursor update_screen_character
+		cursor ++ let cursor
+	else
+		#end of line
+	end
+	cursor set_col_cursor
+end
+
+# Removes a single character from the current line
+func feed_backspace do
+	get_col_cursor let cursor
+	cursor 0 > if
+		SCREEN_BUFFER cursor + -- 0 !8
+		0 cursor -- update_screen_character
+		cursor -- let cursor
+	else
+		#end of line
+	end
+	cursor set_col_cursor
+end
+
+# Clears the screen buffer
+func clear_screen do
 	0 let row
 	while row SCREEN_ROWS != do
 		0 let col
@@ -17,8 +94,11 @@ func clear_screen do
 		end
 		row ++ let row
 	end
+	0 set_col_cursor
+	update_screen
 end
 
+# Starts a new line
 func scroll_screen do
 
 	0 set_col_cursor
@@ -55,50 +135,5 @@ func scroll_screen do
 	update_screen
 end
 
-func update_screen do
-	SCREEN_MEMORY let sm
-	SCREEN_BUFFER let sb
-	0 let i
-	while i SCREEN_ROWS SCREEN_COLUMNS * != do
-		sb ?8 let val
-		sm val !8 # character
-		sm ++ 0x0f !8 # color
 
-		sb ++ let sb
-		sm 2 + let sm
-		i ++ let i
-	end
-end
-
-func update_screen_character row col do
-	col
-	row SCREEN_COLUMNS * +
-	let i
-	
-	SCREEN_BUFFER i + ?8 let val
-	SCREEN_MEMORY i 2 * + val !8 # character
-	SCREEN_MEMORY i 2 * ++ + 0x0f !8 # color
-	i ++ let i
-end
-
-func feed_character char do
-	get_col_cursor let cursor
-	cursor SCREEN_COLUMNS < if
-		SCREEN_BUFFER cursor + char !8
-		0 cursor update_screen_character
-		cursor ++ let cursor
-	else
-		#end of line
-	end
-	cursor set_col_cursor
-end
-
-func col_cursor_addr do "1234567" end
-func set_col_cursor val do col_cursor_addr val !8 end
-func get_col_cursor do col_cursor_addr ?8 end
-
-func SCREEN_BUFFER  do 0x100000 end
-func SCREEN_MEMORY  do 0xb8000 end # true address
-func SCREEN_ROWS    do 25 end
-func SCREEN_COLUMNS do 80 end
 

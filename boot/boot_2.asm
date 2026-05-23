@@ -1,3 +1,30 @@
+post_boot_load:
+
+[bits 16]
+switch_to_pm:
+    cli
+    lgdt [gdt_descriptor]
+    mov eax, cr0
+    or eax, 0x1
+    mov cr0, eax
+    jmp CODE_SEG:init_pm
+
+[bits 32]
+init_pm:
+    mov ax, DATA_SEG
+    mov ds, ax
+    mov ss, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    mov ebp, 0x90000
+    mov esp, ebp
+
+    mov eax, 0
+
+    jmp kernel_start
+
+
 gdt_start: ; don't remove the labels, they're needed to compute sizes and jumps
     ; the GDT starts with a null 8-byte
     dd 0x0 ; 4 byte
@@ -33,3 +60,7 @@ gdt_descriptor:
 ; define some constants for later use
 CODE_SEG equ gdt_code - gdt_start
 DATA_SEG equ gdt_data - gdt_start
+
+%include "kernel/kernel.asm"
+
+;times 512 * 100 - ($-$$) db 0
