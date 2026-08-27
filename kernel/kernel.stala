@@ -3,9 +3,9 @@ include "stdlib/x86_32_asm.stala"
 include "kernel/screenIO.stala"
 include "kernel/keyboard.stala"
 
-#include "kernel/programs/echo.stala"
-#include "kernel/programs/clear.stala"
-#include "kernel/programs/help.stala"
+include "kernel/programs/echo.stala"
+include "kernel/programs/clear.stala"
+include "kernel/programs/help.stala"
 include "kernel/programs/disk.stala"
 
 
@@ -26,21 +26,20 @@ func main do
 			USER_INPUT_BUFFERT SCREEN_COLUMNS + 0 !8 # make sure last
 			scroll_screen
 
-			#USER_INPUT_BUFFERT "ECHO " strstr USER_INPUT_BUFFERT = if
-			#	USER_INPUT_BUFFERT run_program_echo	
-			#else USER_INPUT_BUFFERT "CLEAR" streq elif
-			#	USER_INPUT_BUFFERT run_program_clear	
-			#else USER_INPUT_BUFFERT "HELP" streq elif
-			#	USER_INPUT_BUFFERT run_program_help	
-			#else
-			#	"invalid command!" feed_string scroll_screen
-			#	USER_INPUT_BUFFERT run_program_help
-			#end
-
-			USER_INPUT_BUFFERT run_program_disk
+			USER_INPUT_BUFFERT "ECHO " strstr USER_INPUT_BUFFERT = if
+				USER_INPUT_BUFFERT run_program_echo	
+			else USER_INPUT_BUFFERT "CLEAR" streq elif
+				USER_INPUT_BUFFERT run_program_clear	
+			else USER_INPUT_BUFFERT "HELP" streq elif
+				USER_INPUT_BUFFERT run_program_help	
+			else USER_INPUT_BUFFERT "DISK" strstr USER_INPUT_BUFFERT = elif
+				USER_INPUT_BUFFERT run_program_disk	
+			else
+				"invalid command!" feed_string scroll_screen
+				USER_INPUT_BUFFERT run_program_help
+			end
 
 			scroll_screen		
-
 
 		else key_button BTN_BACKSPACE = elif
 			feed_backspace
@@ -53,13 +52,9 @@ func main do
 	end	
 end
 
-
-
 func USER_INPUT_BUFFERT do 
-#"0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"
-0x300000
+	"0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"
 end
-
 
 func delay do
 	1000000 let i

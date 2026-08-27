@@ -4,7 +4,7 @@ func run_program_disk str do
 
 	sector_index ++ let sector_index
 	
-	SECTOR_BUFFERT sector_index 10 int_to_str
+	#SECTOR_BUFFERT sector_index 10 int_to_str
 	#SECTOR_BUFFERT feed_string
 
 	SECTOR_BUFFERT sector_index 1
@@ -12,7 +12,9 @@ func run_program_disk str do
 	asm "call pop_ecx"
 	asm "call pop_eax"
 	asm "call pop_edi"
+	#TODO: fix
 	#asm "call ata_lba_read"
+	
 
 	SECTOR_BUFFERT let ptr
 

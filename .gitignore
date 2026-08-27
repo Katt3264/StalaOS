@@ -4,6 +4,5 @@
 /stdlib
 stala_x86_32
 /backup
-TODO.txt
-/boot_sector
 /unused
+/build_temp

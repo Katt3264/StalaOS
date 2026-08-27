@@ -1,6 +1,10 @@
 [org 0x7c00]
 [bits 16]
-    
+
+; ########################
+; # START OF BOOT SECTOR #
+; ########################
+
 disk_load:
 
     mov [BOOT_DRIVE], dl
@@ -23,7 +27,7 @@ disk_loop:
     inc dh
     dec dh
     int 0x13      ; BIOS interrupt
-    ;jc disk_error ; if error (stored in the carry bit)
+    jc disk_error ; if error (stored in the carry bit)
 
 
     ; increment sector pointer
@@ -59,10 +63,10 @@ disk_loop:
 .done:
     jmp post_boot_load
 
-sector db 2
-head db 0
-cylinder db 0
-remaining      db 127 ; max 17 before head change; 20 gets loaded: 10240 bytes total
+sector db 2	; current sector to read
+head db 0	; current head to read
+cylinder db 0	; current cylinder to read
+remaining db 127	; max 17 before head change; 20 gets loaded: 10240 bytes total
 BOOT_DRIVE db 0
 
 disk_error:
